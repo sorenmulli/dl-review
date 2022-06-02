@@ -1,0 +1,115 @@
+\documentclass[12pt,fleqn,twocolumn]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=3cm, includeheadfoot]{geometry}
+
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{changepage}
+\usepackage[nottoc, numbib]{tocbibind}
+\usepackage{lastpage}
+\usepackage{setspace}
+\usepackage[bottom]{footmisc}
+\usepackage{titling}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{icomma}
+
+\usepackage{csquotes} % To avoid biber warnings
+\usepackage[backend=biber, style=alphabetic, citestyle=alphabetic, maxcitenames=4, maxbibnames=4, mincitenames=2]{biblatex}
+\usepackage{dirtytalk}
+
+\mathcode`\*=\number\cdot
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\acomm}[1]{\hspace{2.5cm}\text{#1}}
+\newcommand{\code}[1]{{\texttt{\small#1}}}
+
+\newcommand{\md}{\ensuremath{\text{d}}}
+\newcommand{\NN}{\ensuremath{\mathbb N}}
+\newcommand{\ZZ}{\ensuremath{\mathbb Z}}
+\newcommand{\QQ}{\ensuremath{\mathbb Q}}
+\newcommand{\RR}{\ensuremath{\mathbb R}}
+\newcommand{\CC}{\ensuremath{\mathbb C}}
+\newcommand{\LL}{\ensuremath{\mathbb L}}
+\newcommand{\PP}{\ensuremath{\mathbb P}}
+\newcommand{\transpose}[1]{\ensuremath{#1^{\textup T}}}
+
+\newcommand{\half}{\ensuremath{\frac{1}{2}}}
+\newcommand{\third}{\ensuremath{\frac{1}{3}}}
+\newcommand{\fourth}{\ensuremath{\frac{1}{4}}}
+\newcommand{\ctp}[1]{\ensuremath{\cdot10^{#1}}}
+\newcommand{\reci}{\ensuremath{^{-1}}}
+
+\usepackage[acronym, toc]{glossaries}
+\input{acronyms.tex}
+
+
+\addbibresource{references.bib}
+
+\setlength{\droptitle}{-10ex}
+
+\title{Hush-hush Gradients: A Review of Differential Privacy for Deep Learning}
+
+\author{Søren Winkel Holm}
+\date{\today}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Søren Winkel Holm}
+\chead{}
+\rhead{Technical University of Denmark}
+\lfoot{Differential Privacy for Deep Learning}
+\rfoot{Page \thepage{} of \pageref{LastPage}}
+
+\graphicspath{{imgs/}}
+\linespread{1.15}
+
+\begin{document}
+\setlength{\headheight}{15pt}
+\addtolength{\topmargin}{-2.5pt}
+
+\maketitle
+\thispagestyle{fancy}
+% \tableofcontents
+
+\section*{Introduction}%
+\label{sec:Introduction}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[clip, trim=11.5cm 12cm 2.5cm 8cm, width=.8\linewidth]{extracting.pdf}
+        \caption{The extraction attack performed on GPT-2 \cite[Fig. 1]{carlini2021extracting} (private data redacted).}
+    \label{fig:extracting.pdf}
+\end{figure}\noindent
+
+
+\section*{Fundamental Concepts}%
+\label{sec:Fundamental Concepts}
+\acrfull{dp} is a field seeking to hide information about individuals when publishing quantitative patterns about groups.
+This general problem is historically faced in releases of statistical data analyses by e.g. official organizations \cite{dalenius1977stat, wiki2022diff}.
+An algorithm is thus differentially private if a third party observer cannot extract individual information from its' computation.
+The goal can has been robustly defined \cite[pp. 5]{dwork2014alg} as
+\begin{displayquote}
+Differential privacy describes a promise, made by a data holder, or curator, to a data subject: “You will not be affected, adversely or otherwise, by allowing your data to be used in any study or analysis, no matter what other studies, data sets, or information sources, are available.”
+\end{displayquote}
+A \acrfull{ml} model \(f(x|w)=\hat y \approx y\) trained on a data set \(\mathcal D\) exposes data patterns when its' parametrization $w$ or simply predictions $(x, \hat y)$ are released, and these data patterns may be subject to \acrshort{dp} concerns \cite[Chap. 11]{dwork2014alg}.
+
+\section*{State of the Art}%
+\label{sec:State of The Art}
+
+\section*{Open Problems}%
+\label{sec:Open Problems}
+
+\renewcommand*{\bibfont}{\normalfont\footnotesize}
+\printbibliography[heading=bibintoc]
+
+\printglossary[type=\acronymtype]
+
+\end{document}
