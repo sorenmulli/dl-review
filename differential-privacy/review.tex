@@ -130,6 +130,10 @@ Thus, for $1-\delta$ of the probability density over algorithmic randomness, it 
 Often, $\delta=0$, requring the stronger $\varepsilon$-privacy \cite{wiki2022diff}.
 For the Gaussian additive noise mechanism \eqref{eq:gauss}, $(\varepsilon, \delta)$-privacy is achieved when $\sigma_{\Delta g}^2=\Delta g \ln(\nicefrac 1 \delta)\varepsilon\reci$ \cite[App. A]{dwork2014alg}.
 
+\acrshort{ml} algorithms are randomized algorithms and as such, simple $(\varepsilon, \delta)$-privacy can be applied directly, though many approaches such as additive noise mechanisms raise the number of samples required to obtain similar performance \cite[pp.221]{dwork2014alg}.
+A practical way to integrate the \acrshort{dp} mechanism into \acrshort{dl} training is to modify how the loss gradient estimate $g_t = \nabla \mathcal L(\hat y, y | w_t)$ is used by the optimizer $w_{t+1} = w_t - \eta_t m(g_t)$ \cite{rade2019tensorflow}.
+$m$ could add noise or clip the gradient \cite{abadi2016dldp}.
+
 \section*{State of the Art}%
 \label{sec:State of The Art}
 
