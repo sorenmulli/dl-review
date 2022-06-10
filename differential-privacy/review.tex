@@ -37,6 +37,7 @@
 \newcommand{\QQ}{\ensuremath{\mathbb Q}}
 \newcommand{\RR}{\ensuremath{\mathbb R}}
 \newcommand{\CC}{\ensuremath{\mathbb C}}
+\newcommand{\DD}{\ensuremath{\mathbb D}}
 \newcommand{\LL}{\ensuremath{\mathbb L}}
 \newcommand{\PP}{\ensuremath{\mathbb P}}
 \newcommand{\transpose}[1]{\ensuremath{#1^{\textup T}}}
@@ -101,11 +102,33 @@ The methods of \acrfull{dp} are suitable for this task and the relevant concepts
 Achieving \acrshort{dp} corresponds to making a promise of hiding information about individuals when publishing quantitative patterns about groups \cite[pp. 5]{dwork2014alg}.
 This general problem is historically faced in releases of statistical data analyses by e.g. official organizations \cite{dalenius1977stat, wiki2022diff}.
 An algorithm is thus differentially private if a third party observer cannot extract individual information from its' computation.
-% The goal can has been robustly defined \cite[pp. 5]{dwork2014alg} as
-% \begin{displayquote}
-% Differential privacy describes a promise, made by a data holder, or curator, to a data subject: “You will not be affected, adversely or otherwise, by allowing your data to be used in any study or analysis, no matter what other studies, data sets, or information sources, are available.”
-% \end{displayquote}
 In this context, a \acrfull{ml} model \(f(x|w)=\hat y \approx y\) trained on a data set \(\mathcal D\) exposes data patterns when either its' parametrization $w$ or predictions $(x, \hat y)$ are released.
+
+Let $\mathcal D_i \in \DD$ be a data set containing the private information of individual $i$ and $\mathcal D_{\hat i} \in \DD$ be identical except excluding this private information.
+For most approaches, the goal is to maximise \acrshort{dp} by minimising the impact of individual data on computation which can be be quantified by measures such as $\ell_1$-sensitivity \cite[pp.31]{dwork2014alg} $\Delta g$ of a numeric statistic $g: \DD \rightarrow \RR^k$,
+\begin{equation}
+    \Delta g= \operatorname{max}_{i, \hat i \in \DD} ||g(x)-g(y)||_1.
+\end{equation}
+To achieve this, additive noise mechanisms can be used.
+For $\Delta g$, this can be achieved by adding Gaussian noise to outputs \cite[D 3.3]{dwork2014alg} 
+\begin{equation}\label{eq:gauss}
+  f(x)+(Y_1, \ldots, Y_k), Y_i \sim \mathcal N(0, \sigma_{\Delta g}^2)  
+\end{equation}
+The end goal of such \acrshort{dp} mechanisms on random algorithms $\mathcal F(\mathcal D)$ outputting $w \in \operatorname{Im}(\mathcal F)$ with probability $p_{\mathcal F}(w|\mathcal D)$, is to guarantee $(\varepsilon, \delta)$-privacy \cite[Def. 2.4]{dwork2014alg} requiring $\forall S \in \operatorname{Im}(\mathcal F)$ that
+\begin{equation}
+    P\left(
+        \mathcal{F}(\mathcal D_i) \in S
+    \right)
+    \leq
+    \exp(\varepsilon)
+    P\left(
+        \mathcal{F}(\mathcal D_{\hat i}) \in S
+    \right)
+    +\delta.
+\end{equation}
+Thus, for $1-\delta$ of the probability density over algorithmic randomness, it is promised that adding your private data to $\mathcal D$ does not raise your risk of harm by more than $\exp(\varepsilon)$ \cite[pp. 21]{dwork2014alg}.
+Often, $\delta=0$, requring the stronger $\varepsilon$-privacy \cite{wiki2022diff}.
+For the Gaussian additive noise mechanism \eqref{eq:gauss}, $(\varepsilon, \delta)$-privacy is achieved when $\sigma_{\Delta g}^2=\Delta g \ln(\nicefrac 1 \delta)\varepsilon\reci$ \cite[App. A]{dwork2014alg}.
 
 \section*{State of the Art}%
 \label{sec:State of The Art}
