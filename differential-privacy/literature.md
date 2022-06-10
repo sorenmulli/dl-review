@@ -3,14 +3,11 @@
 ## Use for background 
 - [Wikipedia](https://en.wikipedia.org/wiki/Differential_privacy)
 
-- [GeeksForGeeks tutorial in context of simple database](https://www.geeksforgeeks.org/differential-privacy-and-deep-learning/)
-
-    Includes good definition of DP
-
 - [Explanation of DP-SGD and DP generally in blog](https://towardsdatascience.com/differential-privacy-in-deep-learning-cf9cc3591d28)
 
-
 - [Blog of recent developments and discussions in DP](https://differentialprivacy.org/)
+
+- [The Algorithmic Foundations of Differential Privacy](https://privacytools.seas.harvard.edu/files/privacytools/files/the_algorithmic_foundations_of_differential_privacy_0.pdf)
 
 ## Focus articles SOTA
 
