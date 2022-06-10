@@ -81,6 +81,13 @@
 
 \section*{Introduction}%
 \label{sec:Introduction}
+The field of \acrfull{dl} is for many subfields moving towards a setup where large multi-purpose foundation models are developed and trained at major companies or research instutitions, and then released for engineers to adapt to specific applications \cite[pp. 3]{bommasani2021oppurt}.
+This application of the open-source principle to pre-trained models improves scientific reproduction ability \cite[pp. 3]{hartley2020dtool} and technology accessibility \cite[pp. 139]{bommasani2021oppurt}.
+One risk, however, is an adversarial actor exploiting a property of \acrshort{dl} models: 
+Parts of training data is generally recoverable from model weights \cite{nasr2019privacy, shokri2017membership}.
+This might expose proprietary data or the private data of individuals as exemplified for \acrfull{nlp} language models in Figure \ref{fig:extracting.pdf}.
+As large-scale data sets are here to stay \cite{sun2017unreasonable}, algorithmic methods for improving the privacy of foundation models are required.
+The methods of \acrfull{dp} are suitable for this task and the relevant concepts, algorithms and problems will here be reviewed.
 
 \begin{figure}[H]
     \centering
@@ -89,17 +96,16 @@
     \label{fig:extracting.pdf}
 \end{figure}\noindent
 
-
 \section*{Fundamental Concepts}%
 \label{sec:Fundamental Concepts}
-\acrfull{dp} is a field seeking to hide information about individuals when publishing quantitative patterns about groups.
+Achieving \acrshort{dp} corresponds to making a promise of hiding information about individuals when publishing quantitative patterns about groups \cite[pp. 5]{dwork2014alg}.
 This general problem is historically faced in releases of statistical data analyses by e.g. official organizations \cite{dalenius1977stat, wiki2022diff}.
 An algorithm is thus differentially private if a third party observer cannot extract individual information from its' computation.
-The goal can has been robustly defined \cite[pp. 5]{dwork2014alg} as
-\begin{displayquote}
-Differential privacy describes a promise, made by a data holder, or curator, to a data subject: “You will not be affected, adversely or otherwise, by allowing your data to be used in any study or analysis, no matter what other studies, data sets, or information sources, are available.”
-\end{displayquote}
-A \acrfull{ml} model \(f(x|w)=\hat y \approx y\) trained on a data set \(\mathcal D\) exposes data patterns when its' parametrization $w$ or simply predictions $(x, \hat y)$ are released, and these data patterns may be subject to \acrshort{dp} concerns \cite[Chap. 11]{dwork2014alg}.
+% The goal can has been robustly defined \cite[pp. 5]{dwork2014alg} as
+% \begin{displayquote}
+% Differential privacy describes a promise, made by a data holder, or curator, to a data subject: “You will not be affected, adversely or otherwise, by allowing your data to be used in any study or analysis, no matter what other studies, data sets, or information sources, are available.”
+% \end{displayquote}
+In this context, a \acrfull{ml} model \(f(x|w)=\hat y \approx y\) trained on a data set \(\mathcal D\) exposes data patterns when either its' parametrization $w$ or predictions $(x, \hat y)$ are released.
 
 \section*{State of the Art}%
 \label{sec:State of The Art}
@@ -107,6 +113,7 @@ A \acrfull{ml} model \(f(x|w)=\hat y \approx y\) trained on a data set \(\mathca
 \section*{Open Problems}%
 \label{sec:Open Problems}
 
+\clearpage
 \renewcommand*{\bibfont}{\normalfont\footnotesize}
 \printbibliography[heading=bibintoc]
 
