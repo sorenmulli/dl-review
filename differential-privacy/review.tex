@@ -22,15 +22,15 @@
 \usepackage{nicefrac}
 \usepackage{icomma}
 
-\usepackage{csquotes} % To avoid biber warnings
+\usepackage{csquotes}
 \usepackage[backend=biber, style=alphabetic, citestyle=alphabetic, maxcitenames=4, maxbibnames=4, mincitenames=2]{biblatex}
-\usepackage{dirtytalk}
 
 \mathcode`\*=\number\cdot
 \newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
 \newcommand{\acomm}[1]{\hspace{2.5cm}\text{#1}}
 \newcommand{\code}[1]{{\texttt{\small#1}}}
 
+\newcommand{\pro}{\ensuremath{\:\%{}\:}}
 \newcommand{\md}{\ensuremath{\text{d}}}
 \newcommand{\NN}{\ensuremath{\mathbb N}}
 \newcommand{\ZZ}{\ensuremath{\mathbb Z}}
@@ -93,7 +93,7 @@ The methods of \acrfull{dp} are suitable for this task and the relevant concepts
 \begin{figure}[H]
     \centering
         \includegraphics[clip, trim=11.5cm 12cm 2.5cm 8cm, width=.8\linewidth]{extracting.pdf}
-        \caption{The extraction attack performed on GPT-2 \cite[Fig. 1]{carlini2021extracting} (private data redacted).}
+        \caption{The private data exposed by GPT-2 found using a simple extraction attack \cite[Fig. 1]{carlini2021extracting} (private data redacted).}
     \label{fig:extracting.pdf}
 \end{figure}\noindent
 
@@ -130,12 +130,31 @@ Thus, for $1-\delta$ of the probability density over algorithmic randomness, it 
 Often, $\delta=0$, requring the stronger $\varepsilon$-privacy \cite{wiki2022diff}.
 For the Gaussian additive noise mechanism \eqref{eq:gauss}, $(\varepsilon, \delta)$-privacy is achieved when $\sigma_{\Delta g}^2=\Delta g \ln(\nicefrac 1 \delta)\varepsilon\reci$ \cite[App. A]{dwork2014alg}.
 
-\acrshort{ml} algorithms are randomized algorithms and as such, simple $(\varepsilon, \delta)$-privacy can be applied directly, though many approaches such as additive noise mechanisms raise the number of samples required to obtain similar performance \cite[pp.221]{dwork2014alg}.
+\acrshort{ml} training procedures are randomized algorithms and as such, simple $(\varepsilon, \delta)$-privacy can be applied directly, though many approaches such as additive noise mechanisms raise the number of samples required to obtain similar performance \cite[pp.221]{dwork2014alg}.
 A practical way to integrate the \acrshort{dp} mechanism into \acrshort{dl} training is to modify how the loss gradient estimate $g_t = \nabla \mathcal L(\hat y, y | w_t)$ is used by the optimizer $w_{t+1} = w_t - \eta_t m(g_t)$ \cite{rade2019tensorflow}.
 $m$ could add noise or clip the gradient \cite{abadi2016dldp}.
 
 \section*{State of the Art}%
 \label{sec:State of The Art}
+The foundational application of \acrshort{dp} to \acrshort{dl} was performed at Google by \textcite{abadi2016dldp} in \citeyear{abadi2016dldp} where \acrfull{dpsgd} was presented.
+This algorithm modifies the gradient estimate of a $B$-sized batch by setting
+\begin{align*}
+    m(g_t) &= \frac 1 B \Big(
+        \sum_{i=0}^B \frac{\mathbf g_t(x_i)}{\operatorname{max}\left(1, || \mathbf g_t(x_i)||_2 C\reci\right)}
+    \\ &+ \mathbf e \Big), \mathbf e\sim \mathcal N(0, \sigma^2C^2 \mathbf I),
+\end{align*}
+where the gradient clipping hyperparameter $C$ and the noise hyperparameter $\sigma$ can be chosen such that is $(\varepsilon, \delta)$-privacy can be guaranteed for any $\varepsilon, \delta > 0$ \cite[Ch. 3.1]{abadi2016dldp}.
+When requiring $(8, 10\ctp{-5})$-privacy, the paper finds performance drops of $1.3\pro$ for MNIST and $7\pro$ for CIFAR-10 \cite[Chap. 5.3]{abadi2016dldp} and that computational time was increased by the requirement of single example gradients $\mathbf g_t(x_i)$ especially for convolutional layers \cite[Chap. 4]{abadi2016dldp}.
+The clipping performed in $m$ is used for assuring an upper bound on sensitivity from which the correct noise in the Gaussian additive noise mechanism can be used \cite[Chap. 4]{abadi2016dldp}.
+
+\acrshort{dpsgd} remains highly influential and is used as default in leading implementations TensorFlow Privacy \cite{rade2019tensorflow} and PyTorch Opacus \cite{yousef2021opacus}.
+
+\acrshort{dpsgd} was swiftly combined with the another main \acrshort{dl} privacy tool, \acrfull{fl} by \textcite{mcmahan2017learningdp} in \citeyear{mcmahan2017learningdp}, producing \acrfull{dpfa} which was used for training a high-performance language model with privacy guarantees \cite[Chap. 3]{mcmahan2017learningdp}.
+
+
+% https://www.semanticscholar.org/paper/Adaptive-Laplace-Mechanism%3A-Differential-Privacy-in-Phan-Wu/1f8be49d63c694ec71c2310309cd02a2d8dd457f
+% https://www.semanticscholar.org/paper/A-General-Approach-to-Adding-Differential-Privacy-McMahan-Andrew/f4966c81b9fe6476e8d418b75308b36f44865541
+% https://www.semanticscholar.org/paper/Differentially-Private-Model-Publishing-for-Deep-Yu-Liu/795f68480f51d4359b85b04d1c7edd41423bf4c2
 
 \section*{Open Problems}%
 \label{sec:Open Problems}
