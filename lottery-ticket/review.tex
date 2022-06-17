@@ -82,9 +82,36 @@
 
 \section*{Introduction}%
 \label{sec:Introduction}
+While \acrfull{dl} is celebrated as a universal technological step forward, making complex modelling available to many industries requiring less use of domain-specialised engineers, the computational cost of the training procedure of \acrfull{dnn}'s makes the technology unavailable for low-resource actors.
+The price of large language modelling projects such as Google's T5 is estimated in the region of \$ 10 M and such tech companies have a leading role in research.
+% https://arxiv.org/pdf/2004.08900.pdf
+% https://medium.com/criteo-engineering/neurips-2020-comprehensive-analysis-of-authors-organizations-and-countries-a1b55a08132e
+% https://medium.com/criteo-engineering/icml-2020-comprehensive-analysis-of-authors-organizations-and-countries-c4d1bb847fde
+While the processing of big data is naturally computationally intensive, much of training cost is caused by a large number of epochs being required before convergence.
+\acrfull{lth} points to \acrshort{dnn} learning dynamics that are keeping this number high.
 
+\begin{figure}
+    \centering
+        \includegraphics[page=3, clip, trim=5cm 21.5cm 12.5cm 2.7cm, width=.8\linewidth]{pruning.pdf}
+        \includegraphics[page=3, clip, trim=10cm 21.85cm 4cm 2.7cm, width=\linewidth]{pruning.pdf}
+        \caption{The original iterative pruning method where connectivity training corresponds to standard full training of a dense \acrshort{dnn} \cite[Fig. 2 and 3]{han2015learning}.}
+    \label{fig:pruning.pdf}
+\end{figure}\noindent
+To help availability, rich actors often share the trained model parametrizations but even in this case, application might be widely inaccessible because of computational costs of inference using these large parametrizations.
+This problem has been attacked using model pruning, reducing trained model size while retaining performance, but the expensive training of the full \acrshort{dnn} has generally been required.
+\acrshort{lth} explains why an initial full training is generally required and opens up for researching how to train efficient parametrizations from scratch.
 
 \section*{Fundamental Concepts}%
+\acrshort{dnn} pruning refers to disabling particular model connections $w_i \leftarrow 0$ possibly to improve generalization, reducing memory constraints in inference and lowering inference computation \cite{han2015learning}.
+Pruning during training is related to regularization e.g. using dropout, while pruning after fully training a dense network parametrization $q(w)=\tilde w$ is often motivated by computational cost, and might require some retraining to limit the decrease in accuracy \cite{lange2020lth}.
+Disabling unnecessary weights is a way to learn the connectivity of a \acrshort{dnn} and can be performed iteratively based on magnitude such as 
+\begin{equation}
+    \forall i \text{ s. t. } |w_i^{(t)}|<k \text{ let } w_i^{(t+1)} \leftarrow 0,
+\end{equation}
+where each iteration is followed by retraining, $k$ is a threshold set to e.g. $k=s\sqrt{\operatorname{Var}[w]}, s=\half$ \cite{han2015learning, nzmora2019distiller} and the procedure is stopped when a specified compression level of performance drop is reached \cite{han2015learning} as shown on Figure \ref{fig:pruning.pdf}.
+Pruning might be performed locally by assigning layer separate thresholds, having layer-specific target compression levels or fixing part of the \acrshort{dnn} \cite{han2015learning}.
+
+
 
 \section*{State of the Art}%
 \section*{Open Problems}%
