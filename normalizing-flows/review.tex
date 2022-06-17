@@ -79,12 +79,20 @@
 \maketitle
 \thispagestyle{fancy}
 % \tableofcontents
-
+ % Explain the basic concepts of normalizing flows and how it related to generative modelling and approximate Bayesian inference
 \section*{Introduction}%
 \label{sec:Introduction}
-
+In many technical fields, modelling complex systems is in recent years achieved using \acrfull{dl} instead of setting up domain-suitable inferential statistical models \cite{bzdok2018point, breiman2001stat}.
+The success of \acrshort{dl} can be attributed to the potential for using similar algorithms to achieve high prediction accuracy across different big data problems \cite{parloff2016dl}.
+However, a need for moving these high-accuracy, black box methods towards more robustness and explainability has been highlighted.
+Seeking this goal, methods have been developed for characterising complete distributions of model predictions, parametrizations or training data instead of only focusing specific realisations of these.
+This distributional view of \acrshort{dl} is used in \acrfull{dgm} and in the wider context \acrfull{bml}.
+For both the task of \acrshort{dgm} specifically and the general task of approximating posterior distributions in \acrshort{bml}, robust and general methods for constructing complex distributions are needed.
+\acrfull{nf} specify a scalable mechanism allowing for the representation of arbitrary distributions.
+This method is here reviewed with a focus on its' relevance for \acrshort{dl}.
 
 \section*{Fundamental Concepts}%
+
 
 \section*{State of the Art}%
 \section*{Open Problems}%

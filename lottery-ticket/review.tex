@@ -100,6 +100,7 @@ While the processing of big data is naturally computationally intensive, much of
 To help availability, rich actors often share the trained model parametrizations but even in this case, application might be widely inaccessible because of computational costs of inference using these large parametrizations.
 This problem has been attacked using model pruning, reducing trained model size while retaining performance, but the expensive training of the full \acrshort{dnn} has generally been required.
 \acrshort{lth} explains why an initial full training is generally required and opens up for researching how to train efficient parametrizations from scratch.
+These ideas and methods will here be reviewed.
 
 \section*{Fundamental Concepts}%
 \acrshort{dnn} pruning refers to disabling particular model connections $w_i \leftarrow 0$ possibly to improve generalization, reducing memory constraints in inference and lowering inference computation \cite{LeCun1989OptimalBD}.
