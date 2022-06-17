@@ -1,7 +1,6 @@
 # Literature links and notes
 
 ## Use for background 
-- https://towardsdatascience.com/introduction-to-normalizing-flows-d002af262a4b
 - https://arxiv.org/abs/1908.09257
 - https://deepgenerativemodels.github.io/notes/flow/
 - https://paperswithcode.com/method/normalizing-flows
