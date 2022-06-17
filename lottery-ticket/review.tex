@@ -102,16 +102,23 @@ This problem has been attacked using model pruning, reducing trained model size 
 \acrshort{lth} explains why an initial full training is generally required and opens up for researching how to train efficient parametrizations from scratch.
 
 \section*{Fundamental Concepts}%
-\acrshort{dnn} pruning refers to disabling particular model connections $w_i \leftarrow 0$ possibly to improve generalization, reducing memory constraints in inference and lowering inference computation \cite{han2015learning}.
+\acrshort{dnn} pruning refers to disabling particular model connections $w_i \leftarrow 0$ possibly to improve generalization, reducing memory constraints in inference and lowering inference computation \cite{LeCun1989OptimalBD}.
 Pruning during training is related to regularization e.g. using dropout, while pruning after fully training a dense network parametrization $q(w)=\tilde w$ is often motivated by computational cost, and might require some retraining to limit the decrease in accuracy \cite{lange2020lth}.
 Disabling unnecessary weights is a way to learn the connectivity of a \acrshort{dnn} and can be performed iteratively based on magnitude such as 
 \begin{equation}
     \forall i \text{ s. t. } |w_i^{(t)}|<k \text{ let } w_i^{(t+1)} \leftarrow 0,
 \end{equation}
 where each iteration is followed by retraining, $k$ is a threshold set to e.g. $k=s\sqrt{\operatorname{Var}[w]}, s=\half$ \cite{han2015learning, nzmora2019distiller} and the procedure is stopped when a specified compression level of performance drop is reached \cite{han2015learning} as shown on Figure \ref{fig:pruning.pdf}.
-Pruning might be performed locally by assigning layer separate thresholds, having layer-specific target compression levels or fixing part of the \acrshort{dnn} \cite{han2015learning}.
+The pruned parametrizations $w^{(p)}$ can be represented using a mask $m$, $w^{(p)} = m \odot w$.
+Pruning might be structured locally by assigning layer-specific thresholds and target compression levels or by fixing parts of the \acrshort{dnn} \cite{han2015learning}.
+The resulting sparse \acrshort{dnn} $f(x;m\odot w)$ is called a subnetwork of the full, trained $f(x;w)$
 
-
+Simple pruning approaches have empirically been shown to work well across network types and learning tasks with compression rates of $\sim \times 10$ resulting in accuracy drops $\sim 1\pro$ \cite[Fig. 7] {bla2020state}.
+These results do not arise when training from the start with such pruned networks \cite[Chap. 4]{li2016filt}, \cite[Chap. 3.3]{han2015learning}.
+\acrshort{lth} gives an explanation for this effect by postulating the existence of a \emph{winning ticket} for a randomly initialized, dense \acrshort{dnn} $f(x;w^{(0)}), w^{(0)}\sim \mathcal D_w$.
+A winning ticket is a subnetwork $f(x;m\odot w^{(0)})$ that can be trained by itself and reach same generalization error as the full network in the same number of epochs or less.
+The name thus implies the existence of an initialization lottery where specific combinations of connection masks and weight prior realisations allow learning.
+In this context, standard pruning techniques find winning tickets by first learning the entire, dense $w$ and then after training finding $m$.
 
 \section*{State of the Art}%
 \section*{Open Problems}%
