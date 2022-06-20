@@ -154,14 +154,20 @@ Across \acrshort{cv} tasks, \acrshort{eb} tickets performed at the same accuracy
 Also in 2020, two approaches attempted to fully exploit \acrshort{lth} by finding $m$ at initialization were presented.
 One by \textcite{Wang2020PickingWT} called \acrfull{grasp} which required computation of a Hessian-gradient product $\mathbf H \mathbf g$ using a batch of training data after which $m$ is constructed by tresholding network scores $w \odot \mathbf H \mathbf g$.
 The score computation was theoretically motivated through linearised training dynamics \cite[Chap. 4.1]{Wang2020PickingWT} which have been described for wide networks using a kernel over training data \cite{Lee2019WideNN}.
+Another approach also analysed gradient flow at initialization, but this method named \acrfull{synflow} produced by \textcite{Tanaka2020PruningNN}, did not use any training data.
+The researchers identified a key problem with aggressive pruning that especially must be addressed when designing a priori pruning mechanisms: \emph{layer-collapse}, wherein an entire layer is pruned.
+Using avoidance of this problem a guiding principle, synaptic saliency, a score metric which provenly did not induce layer-collapse.
+The ticket was then constructed by optimising the weights against a synaptic saliency loss function based on layer-wise products of absolute weight values.
 
-\cite{Tanaka2020PruningNN}
-\cite{Zhang2021EfficientLT}
+Both methods were tested on \acrshort{cv} tasks and achieved comparative performance to standard \acrshort{lth} with \acrshort{synflow} outperforming all other methods at extreme compression ratios where \acrshort{grasp} and standard magnitude-based \acrshort{lth} suffer from layer-collapse \cite[Chap. 7]{Tanaka2020PruningNN}.
+For multiple architectures, especially of the ResNet type, \acrshort{grasp} is, however, slightly \acrshort{sota} at more reasonable compression ratios of $\times 100$ to $\times 10$\cite[Tab. 4]{Wang2020PickingWT}\cite[Fig. 6]{Tanaka2020PruningNN}.
+Also, the pruning algorithm \acrfull{snip} contains ideas used in both these methods and performs similarly to \acrshort{grasp} also using training data, but is not formulated in the \acrshort{lth} context \cite{Lee2019SNIPSN}.
 
 \section*{Open Problems}%
 \label{sec:Open Problems}
 \begin{itemize}
     \item Sparsity not computationally optimal
+    \item LTH Not proven \cite{Tanaka2020PruningNN} proves other things. Look at https://arxiv.org/pdf/1810.02340.pdf
 \end{itemize}
 
 \clearpage
