@@ -106,11 +106,12 @@ These ideas and methods will here be reviewed.
 \acrshort{dnn} pruning refers to disabling particular model connections $w_i \leftarrow 0$ possibly to improve generalization, reducing memory constraints in inference and lowering inference computation \cite{LeCun1989OptimalBD}.
 Pruning during training is related to regularization e.g. using dropout, while pruning after fully training a dense network parametrization $q(w)=\tilde w$ is often motivated by computational cost, and might require some retraining to limit the decrease in accuracy \cite{lange2020lth}.
 Disabling unnecessary weights is a way to learn the connectivity of a \acrshort{dnn} and can be performed iteratively based on magnitude such as 
-\begin{equation}
+\begin{equation}\label{eq:crit}
     \forall i \text{ s. t. } |w_i^{(t)}|<k \text{ let } w_i^{(t+1)} \leftarrow 0,
 \end{equation}
-where each iteration is followed by retraining, $k$ is a threshold set to e.g. $k=s\sqrt{\operatorname{Var}[w]}, s=\half$ \cite{han2015learning, nzmora2019distiller} and the procedure is stopped when a specified compression level of performance drop is reached \cite{han2015learning} as shown on Figure \ref{fig:pruning.pdf}.
-The pruned parametrizations $w^{(p)}$ can be represented using a mask $m$, $w^{(p)} = m \odot w$.
+where each iteration is followed by retraining, $k$ is a threshold set to e.g. $k=s\sqrt{\operatorname{Var}[w]}, s=\half$ \cite{han2015learning, nzmora2019distiller}. 
+The procedure is stopped when a specified compression level of performance drop is reached \cite{han2015learning} as shown on Figure \ref{fig:pruning.pdf}.
+The pruned parametrizations $w^{(p)}$ can be represented using a mask $m$, $w^{(p)} = m \odot w$ and \eqref{eq:crit} is thus dubbed the masking criterion.
 Pruning might be structured locally by assigning layer-specific thresholds and target compression levels or by fixing parts of the \acrshort{dnn} \cite{han2015learning}.
 The resulting sparse \acrshort{dnn} $f(x;m\odot w)$ is called a subnetwork of the full, trained $f(x;w)$
 
@@ -121,9 +122,26 @@ A winning ticket is a subnetwork $f(x;m\odot w^{(0)})$ that can be trained by it
 The name thus implies the existence of an initialization lottery where specific combinations of connection masks and weight prior realisations allow learning.
 In this context, standard pruning techniques find winning tickets by first learning the entire, dense $w$ and then after training finding $m$.
 
+\acrshort{lth} implies that $m$ can be computed from a full training after which the weights can be \emph{rewinded} to $w^{(0)}$ at which point the training $m \odot w^{(0)}$ should result in a performant network.
+
 \section*{State of the Art}%
+\subsection*{Evidence for ticket existence}
+\acrshort{lth} was presented in \textcite{frankle2018the} in \citeyear{frankle2018the} where empirical evidence for hypothesis was presented on MNIST and CIFAR-10 by rewinding weights to initialization and comparing to random initialization.
+Using iterative pruning, winning tickets were found for all tried \acrshort{dnn}'s and these were found to learn faster than full networks, but for deep networks such as VGG-19, finding the tickets was sensitive to learning rate setup and required warmup steps \cite[Chap. 4]{frankle2018the}.
+In follow-up work, robustness is added to this iterative search for winning tickets i \cite{Frankle2020LinearMC}
+
+HOW WINNING \cite{Renda2020ComparingRA}
+
+
+
+
+\subsection*{Optimal ticket identification}
+
 \section*{Open Problems}%
 \label{sec:Open Problems}
+\begin{itemize}
+    \item Sparsity not optimal
+\end{itemize}
 
 \clearpage
 \renewcommand*{\bibfont}{\normalfont\footnotesize}
