@@ -50,6 +50,7 @@
 
 \usepackage[acronym, toc]{glossaries}
 \input{acronyms.tex}
+\glsdisablehyper
 
 
 \addbibresource{references.bib}
@@ -82,7 +83,7 @@
 
 \section*{Introduction}%
 \label{sec:Introduction}
-While \acrfull{dl} is celebrated as a universal technological step forward, making complex modelling available to many industries requiring less use of domain-specialised engineers, the computational cost of the training procedure of \acrfull{dnn}'s makes the technology unavailable for low-resource actors.
+While \acrfull{dl} is celebrated as a universal technological step forward, making complex modelling available to many industries, the computational cost of the training procedure of \acrfull{dnn}'s makes the technology unaccessible for low-resource actors.
 The price of large language modelling projects such as Google's T5 is estimated in the region of \$ 10 M \cite{Sharir2020TheCO} and such tech companies have a leading role in research \cite{ivanov2020icml, ivanov2020neurips}.
 % https://arxiv.org/pdf/2004.08900.pdf
 While the processing of big data is naturally computationally intensive, much of training cost is caused by a large number of epochs being required before convergence.
@@ -102,19 +103,19 @@ These ideas and methods will here be reviewed.
 
 \section*{Fundamental Concepts}%
 \acrshort{dnn} pruning refers to disabling particular model connections $w_i \leftarrow 0$ possibly to improve generalization, reducing memory constraints in inference and lowering inference computation \cite{LeCun1989OptimalBD}.
-Pruning during training is related to regularization e.g. using dropout, while pruning after fully training a dense network parametrization $q(w)=\tilde w$ is often motivated by computational cost, and might require some fine-tuning to limit the decrease in accuracy \cite{lange2020lth}.
+Pruning during training is related to regularization e.g. using dropout, while pruning after fully training a dense network parametrization often is motivated by computational cost, and might require some fine-tuning to limit the decrease in accuracy \cite{lange2020lth}.
 Disabling unnecessary weights is a way to learn the connectivity of a \acrshort{dnn} and can be performed iteratively based on magnitude such as 
 \begin{equation}\label{eq:crit}
     \forall i \text{ s. t. } |w_i^{(t)}|<k \text{ let } w_i^{(t+1)} \leftarrow 0,
 \end{equation}
-where each iteration is followed by fine-tuning, $k$ is a threshold set to e.g. $k=s\sqrt{\operatorname{Var}[w]}, s=\half$ \cite{han2015learning, nzmora2019distiller}. 
+where each iteration is followed by fine-tuning and $k$ is a threshold set to e.g. $k=s\sqrt{\operatorname{Var}[w]}, s=\half$ \cite{han2015learning, nzmora2019distiller}. 
 The procedure is stopped when a specified compression level of performance drop is reached \cite{han2015learning} as shown on Figure \ref{fig:pruning.pdf}.
-The pruned parametrizations $w^{(p)}$ can be represented using a mask $m$, $w^{(p)} = m \odot w$ and \eqref{eq:crit} is thus dubbed the masking criterion.
+The pruned parametrizations $w^{(p)}$ can be represented using a mask $m$, $w^{(p)} = m \odot w$ and \eqref{eq:crit} is thus dubbed a masking criterion.
 Pruning might be structured locally by assigning layer-specific thresholds and target compression levels or by fixing parts of the \acrshort{dnn} \cite{han2015learning}.
 The resulting sparse \acrshort{dnn} $f(x;m\odot w)$ is called a subnetwork of the full, trained $f(x;w)$
 
-Simple pruning approaches have empirically been shown to work well across network types and learning tasks with compression rates of $\sim \times 10$ resulting in accuracy drops $\sim 1\pro$ \cite[Fig. 7] {bla2020state}.
-These results do not arise when training from the start with such pruned networks \cite[Chap. 4]{li2016filt}, \cite[Chap. 3.3]{han2015learning}.
+Simple pruning approaches have empirically been shown to work well across network types and learning tasks with compression rates of $\sim \times 10$ resulting in accuracy drops of $\sim 1\pro$ \cite[Fig. 7] {bla2020state}.
+These results do not arise when training from the start with randomly pruned networks \cite[Chap. 4]{li2016filt}, \cite[Chap. 3.3]{han2015learning}.
 \acrshort{lth} gives an explanation for this effect by postulating the existence of a \emph{winning ticket} for a randomly initialized, dense \acrshort{dnn} $f(x;w^{(0)}), w^{(0)}\sim \mathcal D_w$.
 A winning ticket is a subnetwork $f(x;m\odot w^{(0)})$ that can be trained by itself and reach same generalization error as the full network in the same number of epochs or less.
 The name thus implies the existence of an initialization lottery where specific combinations of connection masks and weight prior realisations allow learning.
@@ -129,7 +130,7 @@ An effect was seen when comparing training of rewinded weights of a winning tick
 Using iterative pruning, winning tickets were found for all tried \acrshort{dnn}'s and these were found to learn faster than full networks, but for deep networks such as VGG-19, finding the tickets was sensitive to learning rate setup and required warmup steps \cite[Chap. 4]{frankle2018the}.
 
 In follow-up work, the robustness of this iterative search for winning tickets was improved by introducing a procedure called \emph{instability analysis} where the impact of \acrfull{sgd} noise such as minibatch order and augmentations was investigated \cite{Frankle2020LinearMC}.
-This analysis showed that for many deeper networks stability against \acrshort{sgd} noise occurs after a number of training steps $k$.
+This analysis showed that for many deeper networks, stability against \acrshort{sgd} noise occurs after a number of training steps $k$.
 For \acrshort{lth} to hold robustly on these \acrshort{dnn}'s, rewinding of weights was changed from $m \odot w^{(0)}$ being the winning ticket to $m\odot w^{(k)}$ being winning.
 Thus, the winning ticket was not shown to exist at initialization but slightly-trained winning subnetworks were empirically found across challenging datasets and network sizes.
 These winners were dubbed winning matching tickets instead of winning lottery tickets and this weaker hypothesis has been called \acrfull{lthr} \cite{lange2020lth} .
@@ -138,9 +139,9 @@ Concurrently, analysis quantifying the performance of winning tickets compared t
 The rewinding to winning matching tickets and retraining of \acrshort{lthr} ended up outperforming standard pruning that fine-tunes final weights.
 Furthermore, the rewinding approach was superior in a limited-budget setting across \acrfull{nlp} and \acrfull{cv} tasks, and it was concluded that \acrshort{lthr} was \acrfull{sota} for pruning in terms of accuracy, compression and computational cost \cite[Chap. 6]{Renda2020ComparingRA} \cite{lange2020lth}.
 
-In \citeyear{Malach2020ProvingTL}, \acrshort{lth} was theoretically proven for fully-connected ReLU \acrshort{dnn}'s by \texcite{Malach2020ProvingTL} using the theory of random networks.
+In \citeyear{Malach2020ProvingTL}, \acrshort{lth} was theoretically proven for fully-connected ReLU \acrshort{dnn}'s by \textcite{Malach2020ProvingTL} using the theory of random networks.
 In the same paper, an even stronger conjecture was proven:
-For every \acrshort{dnn} of sufficient size, there exists an subnetwork achieving matching performance in itself without retraining \cite[Theorem 2.1]{Malach2020ProvingTL}.
+For every \acrshort{dnn} of sufficient size, there exists an subnetwork achieving matching performance in itself without additional training \cite[Theorem 2.1]{Malach2020ProvingTL}.
 
 \subsubsection*{Early ticket identification}
 The simple train-rewind-retrain approach used to empirically demonstrate the existance of winning matching tickets was revealed to give strong pruning performance across tasks without need for hyperperameter tuning \cite[Chap. 6]{Renda2020ComparingRA}.
@@ -155,15 +156,15 @@ Across \acrshort{cv} tasks, \acrshort{eb} tickets performed at the same accuracy
 
 Also in 2020, two approaches attempted to fully exploit \acrshort{lth} by finding $m$ at initialization were presented.
 One by \textcite{Wang2020PickingWT} called \acrfull{grasp} which required computation of a Hessian-gradient product $\mathbf H \mathbf g$ using a batch of training data after which $m$ is constructed by tresholding network scores $w \odot \mathbf H \mathbf g$.
-The score computation was theoretically motivated through linearised training dynamics \cite[Chap. 4.1]{Wang2020PickingWT} which have been described for wide networks using a kernel over training data \cite{Lee2019WideNN}.
+The score computation was theoretically motivated through linearised training dynamics \cite[Chap. 4.1]{Wang2020PickingWT} which have been described for wide \acrshort{dnn}'s using a kernel over training data \cite{Lee2019WideNN}.
 Another approach also analysed gradient flow at initialization, but this method named \acrfull{synflow} produced by \textcite{Tanaka2020PruningNN}, did not use any training data.
 The researchers identified a key problem with aggressive pruning that especially must be addressed when designing a priori pruning mechanisms: \emph{layer-collapse}, wherein an entire layer is pruned.
-Using avoidance of this problem a guiding principle, synaptic saliency, a score metric which provenly did not induce layer-collapse.
-The ticket was then constructed by optimising the weights against a synaptic saliency loss function based on layer-wise products of absolute weight values.
+Using avoidance of this problem as a guiding principle, the researchers introduced \emph{synaptic saliency}, a score metric which provenly did not induce layer-collapse.
+The ticket was then constructed by optimising the weights against a synaptic saliency loss function based on layer-wise products of absolute weight values \cite[Chap. 6]{Tanaka2020PruningNN}.
 
 Both methods were tested on \acrshort{cv} tasks and achieved comparative performance to standard \acrshort{lth} with \acrshort{synflow} outperforming all other methods at extreme compression ratios where \acrshort{grasp} and standard magnitude-based \acrshort{lth} suffer from layer-collapse \cite[Chap. 7]{Tanaka2020PruningNN}.
 For multiple architectures, especially of the ResNet type, \acrshort{grasp} is, however, slightly \acrshort{sota} at more reasonable compression ratios of $\times 100$ to $\times 10$\cite[Tab. 4]{Wang2020PickingWT}\cite[Fig. 6]{Tanaka2020PruningNN}.
-Also, the pruning algorithm \acrfull{snip} contains ideas used in both these methods and performs similarly to \acrshort{grasp} also using training data, but is not formulated in the \acrshort{lth} context \cite{Lee2019SNIPSN}.
+Also, the influential pruning algorithm \acrfull{snip} contains ideas used in both these methods and performs similarly to \acrshort{grasp} also using training data, but is not formulated in the \acrshort{lth} context \cite{Lee2019SNIPSN}.
 
 \section*{Open Problems}%
 \label{sec:Open Problems}
@@ -172,13 +173,13 @@ Also, the pruning algorithm \acrfull{snip} contains ideas used in both these met
     %     Though the foundational 
     \item \emph{Do tickets generalize?}
         In the original form, a winning ticket is winning for a specific initialization for a specific learning problem and optimization procedure.
-        If, for this specific task, the ticket gradient flow is optimal, it might be natural to assume that the ticket is also relevant for other problems.
-        Existing tests of such ideas show promising results, but are limited to \acrshort{cv} and require care for optimization procedure \cite{Morcos2019OneTT}.
+        If, for this specific task, the ticket gradient flow is optimal, it might be natural to assume that the ticket is also relevant for other, similar problems.
+        Current applications of such ideas show promising results, but are limited to \acrshort{cv} and require care for optimization procedure \cite{Morcos2019OneTT}.
         If cross-task winning tickets are reliably found, these configurations be considered optimal inductive biases and help explain general \acrshort{dnn} learning dynamics.
     \item \emph{How do we use sparsity for improved computational efficiency?}
         Though \acrshort{lth} approaches can compress by staggering factors, they are generally unstructured in their pruning and thus still require the same number of layers.
         Though the pruned network takes up much less storage, the runtime might not be reduced much using modern parallelized \acrshort{dnn} implementations.
-        Further work could improve this, either on the execution side by improving inference of sparse networks, or on the pruning side by focusing on structure \acrshort{lth} for computational efficiency.
+        Further work could improve this, either on the execution side by improving inference of sparse networks, or on the pruning side by focusing on structuring \acrshort{lth} for computational efficiency.
     \item \emph{Can lottery tickets be used to change architectures?}
         If a subnetwork is all you need for effective learning, \acrshort{dnn} design could altogether be changed towards to the beneficial patterns in the tickets.
         The understanding of why lottery tickets improve early learning is thus valuable when considering the optimal architecture for a swift training process resulting in general learning.

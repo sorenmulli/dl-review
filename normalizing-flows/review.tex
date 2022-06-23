@@ -54,6 +54,7 @@
 
 \usepackage[acronym, toc]{glossaries}
 \input{acronyms.tex}
+\glsdisablehyper
 
 \addbibresource{references.bib}
 
@@ -90,7 +91,7 @@ The success of \acrshort{dl} can be attributed to the potential for using simila
 However, a need for moving these high-accuracy, black box methods towards more robustness and explainability has been highlighted.
 Seeking this goal, methods have been developed for characterising complete distributions of model predictions, parametrizations or training data instead of only focusing specific realisations of these.
 This distributional view of \acrshort{dl} is used in \acrfull{dgm} and in the wider context \acrfull{bml}.
-For both the task of \acrshort{dgm} specifically and the general task of approximating posterior distributions in \acrshort{bml}, robust and general methods for constructing complex distributions are needed.
+For both the problem of \acrshort{dgm} specifically and the general task of approximating posterior distributions in \acrshort{bml}, robust and general methods for constructing complex distributions are needed.
 \acrfull{nf} specify a scalable mechanism allowing for the representation of arbitrary distributions.
 This method is here reviewed with a focus on its' relevance for \acrshort{dl}.
 
@@ -99,11 +100,11 @@ Let
 \begin{equation}
     \mathbf Z \in \RR^D \sim p_\mathbf Z,
 \end{equation}
-where $p_\mathbf Z$ is known and analytically tractable distribution, e.g. $p_\mathbf Z=\mathcal N$.
+where $p_\mathbf Z$ is a known and analytically tractable distribution, e.g. $p_\mathbf Z=\mathcal N$.
 Now using a composition of $N$ bijective functions $\mathbf g=\mathbf g_N \circ \cdots \circ \mathbf g_1$ with inverse $\ginv=\ginv_N \circ \cdots \circ \ginv_1$ and Jacobian $\mathbf D\mathbf g$,
 set $\mathbf W=\mathbf g (\mathbf Z)$ giving the density of $\mathbf W$
 \begin{equation}\label{eq:dens}
-    \push(\mathbf w)= p_\mathbf W(\mathbf w)=\frac{p_\mathbf Z \left(\ginv(\mathbf w)\right)}{\left| \det \mathbf D\mathbf g\left(\ginv(\mathbf w)\right) \right|}.
+    p_\mathbf W(\mathbf w)=\push(\mathbf w)=\frac{p_\mathbf Z \left(\ginv(\mathbf w)\right)}{\left| \det \mathbf D\mathbf g\left(\ginv(\mathbf w)\right) \right|}.
 \end{equation}
 In the context of \acrshort{nf}, $\push$ is named the \emph{pushforward} of the base density $p_\mathbf Z$.
 $\push$ pushes the simple density $p_\mathbf Z$ to a possibly arbitrarily complex distribution which is called flow in the \emph{generative direction} \cite{koby2021nf} as
@@ -121,7 +122,7 @@ Using this construction, arbitrarily complex distributions $p_\mathbf W$ can pro
 $\mathbf g$ may have a parametrization $\phi$, resulting in the pushforward being parameter dependant $\push(\mathbf w|\phi)$.
 
 Using \eqref{eq:dens}, \acrshort{nf} allows for density evaluation and using \eqref{eq:gen} for sampling.
-The first quality makes the method relevant for \acrfull{vi} used in \acrshort{bml} for approximating $p=p(\mathbf w | \mathcal D)$ as 
+The first quality makes the method relevant for \acrfull{vi} used in \acrshort{bml} for approximating $p=p(\mathbf w | \mathcal D)$ with approximate distribution 
 \begin{equation}
     q^\star = \operatorname{argmin}_{q\in \mathcal Q} \mathbb D_{KL}[q || p] 
 \end{equation}
@@ -130,9 +131,9 @@ Minimization of \acrshort{kl} corresponds to maximization of the \acrfull{elbo} 
 \begin{equation}
     \mathcal L(\phi) = \mathbb E_{q|\phi}[\ln p(\mathbf w, \mathcal D)] - \mathbb E_{q|\phi}[\ln q(\mathbf w|\phi)].
 \end{equation}
-To optimize this without model-dependant derivations, gradient ascent on the $\mathcal L$ is carried out resulting in \acrfull{bbvi}.
+To optimize this without model-dependant derivations, gradient ascent on $\mathcal L$ is carried out resulting in \acrfull{bbvi}.
 Here, computing gradients of the form $ \nabla_\phi \mathbb E_{q|\phi}[h(\mathbf w)]$ is required.
-If \acrshort{nf} are used such that $q(\mathbf w|\phi)=\push(\mathbf w| \phi)$, the gradients can be computed using the reparametrization trick \cite{JimenezRezende2015VariationalIW}
+If \acrshort{nf} are used, such that $q(\mathbf w|\phi)=\push(\mathbf w| \phi)$, the gradients can be computed using the reparametrization trick \cite{JimenezRezende2015VariationalIW}
 \begin{equation}
     \nabla_\phi \mathbb E_{q|\phi}[h(\mathbf w)]
     =
@@ -151,17 +152,17 @@ This model is generative using \eqref{eq:gen} and can be fitted using \acrfull{m
 
 \section*{State of the Art}%
 \acrshort{nf} build on basic probablistic rules and have been used in the current form since 2010 \cite{koby2021nf}, but their application to \acrshort{bbvi} was made popular in \citeyear{JimenezRezende2015VariationalIW} by \textcite{JimenezRezende2015VariationalIW}.
-Here, the main \acrshort{nf} were called planar flows and were of the form
+Here, main \acrshort{nf} used were called planar flows and were of the form
 \begin{equation}\label{eq:planar}
     \mathbf g(\mathbf z | (\mathbf u, \bm \theta, b)) = \mathbf z + \mathbf u h \left(\bm \theta ^T \mathbf z + b\right)
 \end{equation}
 where $h$ is a smooth non-linearity.
-The term added to $\mathbf z$ can be considered as a single neural network unit motivating stacking this function $N$ times to get more expressiveness.
+The term added to $\mathbf z$ can be considered as a single neural network unit motivating stacking this function $N$ times to get more expressiveness in the composition.
 These flows have the strength of linear-time determinant computation but do not have closed form inverses \cite[Chap. 4.1]{JimenezRezende2015VariationalIW}.
 For running \acrshort{vi}, however, the inverse is not needed and fast computation is key.
 
 Empirical tests were performed, modelling the posterior distribution of deep latent Gaussian models fitted to MNIST and CIFAR-10 \cite[Chap. 6.2]{JimenezRezende2015VariationalIW}.
-As base density, an isotropic Gaussian was used \cite[Chap. 6.1]{JimenezRezende2015VariationalIW} and \acrshort{nf} show competetive performance on this task with \acrshort{kl} and $-\ln p(\mathcal D_{test}$ falling systematically for higher $N$ \cite[Fig. 4, Tab. 2 and 3]{JimenezRezende2015VariationalIW}.
+As base density, an isotropic Gaussian was used \cite[Chap. 6.1]{JimenezRezende2015VariationalIW} and \acrshort{nf} show competetive performance on this task with \acrshort{kl} and $-\ln p(\mathcal D_{test})$ falling systematically for higher $N$ \cite[Fig. 4, Tab. 2 and 3]{JimenezRezende2015VariationalIW}.
 The choice of $N$ governing complexity and possibility to set $\mathbf g$ to match distributional assumptions were highlighted as strengths compared to e.g. mean-field fixed-form \acrshort{bbvi}.
 
 As each flow of the form \eqref{eq:planar} has limited expressivity, a further version similar to a neural network layer with $L$ hidden units has been proposed on the form
@@ -174,20 +175,21 @@ Empirical results show better approximations than the planar flows on most tasks
 \acrshort{nf} were also compared to plain \acrfull{vae} with fully factorized Gaussians with \acrshort{nf} winning on all tasks \cite[Tab. 1, Tab.2]{Berg2018SylvesterNF}.
 
 Same year as the renewed interest in \acrshort{nf} for \acrshort{vi}, \textcite{Dinh2015NICENI} presented \acrfull{nice}, using \acrshort{nf} for \acrshort{dgm} though not referring to the model as \acrshort{nf}.
-In this context, invertibility is required and expressivity has to be high, motivating the introduction of \emph{coupling flows} defined as
+In this context, easy invertibility is required and expressivity has to be high, motivating the introduction of \emph{coupling flows} defined as
 \begin{equation}
     \mathbf g(\mathbf z)  = \mathbf w; \mathbf w_{\mathbb I}=\mathbf h(\mathbf z_{\mathbb I} | m(\mathbf z_{\mathbb J})), \mathbf w_{\mathbb J} = \mathbf z_\mathbb J,
 \end{equation}
 where $\mathbf w$ is partitioned disjointyly into $(\mathbf w_\mathbb I, \mathbf w_\mathbb J)$, $\mathbf h(\cdot, \theta)$ is a bijection and $m$ is any function, often a shallow neural network \cite[Chap. 3]{Dinh2015NICENI}\cite[Chap. 3.4]{koby2021nf}.
-For different tasks, different partitionings can be used, and coupling flows along with autoregressive flows, introduced as \acrfull{iaf} by \textcite{Kingma2017ImprovedVI}, are \acrfull{sota} for density estimation of many tabular datasets \cite[Tab. 2]{koby2021nf}and close to \acrshort{sota} on image datasets \cite[Tab. 3]{koby2021nf}.
+For different tasks, different partitionings can be used, possibly inducing structure such as pixel neighbourhoods \cite[Chap. 3.4]{koby2021nf}. 
+Coupling flows along with autoregressive flows, introduced as \acrfull{iaf} by \textcite{Kingma2017ImprovedVI}, are \acrfull{sota} for \acrshort{nf} density estimation of many tabular datasets \cite[Tab. 2]{koby2021nf} and close to \acrshort{sota} on image datasets \cite[Tab. 3]{koby2021nf}.
 
 \section*{Open Problems}%
 \label{sec:Open Problems}
 \begin{itemize}
     \item \emph{How to choose the base density?}
-        Much focus in the literature is on choice of flows $\mathbf g$.
-        The choise of base density $p_\mathbf Z$ is often not analysed, usually being a standard Gaussian.
-        For tail behaviour, the choice of base density has been shown to impact results \cite{Jaini2019TailsOT} and $p_\mathbf Z$ should possibly seen as a form of prior on modelling behaviour \cite[Chap. 5.1.1]{koby2021nf} and could be adapted to the task at hand.
+        Much focus in the literature is on the choice of flows $\mathbf g$.
+        The choice of base density $p_\mathbf Z$ is often not analysed, usually being a standard Gaussian.
+        For tail behaviour, the choice of base density has been discovered to impact results \cite{Jaini2019TailsOT} and $p_\mathbf Z$ should possibly seen as a form of prior on modelling behaviour \cite[Chap. 5.1.1]{koby2021nf} and could be adapted to the task at hand.
     \item \emph{How to handle discrete distributions?}
         To expand the use of \acrshort{nf} to more tasks such as \acrfull{nlp}, discrete target distributions should be modelled.
         According to \textcite{koby2021nf}, this is currently an open problem. 
@@ -195,8 +197,8 @@ For different tasks, different partitionings can be used, and coupling flows alo
     \item \emph{How compute efficient are flows?}
         For \acrshort{vi} and most \acrshort{bml}, computational cost of producing a posterior distribution is the largest problem.
         While all \acrshort{nf} are presented with theoretical computational considerations for the Jacobian, comparative analysis of \acrshort{nf} often only focuses on final approximation accuracy.
-        A possible lack of emprirical performance analyses might stem from the software implementations being newly develope, thus lacking maturity and adequate hardware acceleration.
-        However with the contuined development of unifying frameworks such as Pyro Normalizing Flows \cite{bingham2018pyro}, a timed comparison might be relevant answering the question of what \acrshort{nf} to use when operating under a constrained compute budget.
+        A possible lack of empirical performance analyses might stem from the software implementations being newly developed and lacking maturity or adequate hardware acceleration.
+        However with the continued development of unifying frameworks such as Pyro Normalizing Flows \cite{bingham2018pyro}, a timed comparison might be relevant for answering the question of what \acrshort{nf} to use when operating under a constrained compute budget.
 \end{itemize}
 
 \clearpage
