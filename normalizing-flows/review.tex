@@ -19,6 +19,7 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{bm}
 \usepackage{nicefrac}
 \usepackage{icomma}
 
@@ -50,9 +51,9 @@
 \newcommand{\ctp}[1]{\ensuremath{\cdot10^{#1}}}
 \newcommand{\reci}{\ensuremath{^{-1}}}
 
+
 \usepackage[acronym, toc]{glossaries}
 \input{acronyms.tex}
-
 
 \addbibresource{references.bib}
 
@@ -96,7 +97,7 @@ This method is here reviewed with a focus on its' relevance for \acrshort{dl}.
 \section*{Fundamental Concepts}%
 Let 
 \begin{equation}
-    \mathbf Z \in \RR^2 \sim p_\mathbf Z,
+    \mathbf Z \in \RR^D \sim p_\mathbf Z,
 \end{equation}
 where $p_\mathbf Z$ is known and analytically tractable distribution, e.g. $p_\mathbf Z=\mathcal N$.
 Now using a composition of $N$ bijective functions $\mathbf g=\mathbf g_N \circ \cdots \circ \mathbf g_1$ with inverse $\ginv=\ginv_N \circ \cdots \circ \ginv_1$ and Jacobian $\mathbf D\mathbf g$,
@@ -143,23 +144,59 @@ Here, data likelihood is
 \begin{align*}
     & \ln p (\mathcal D| \phi)  = \sum_{i=1}^M \ln \push(\mathbf y_i|\phi) = \\
     & \sum_{i=1}^M \left(
-        \ln p_\mathbf Z(\ginv(\mathbf y_i|\phi)) + \ln \left| \det \mathbf D\ginv(\mathbf y_i|\phi)\right|,
+        \ln p_\mathbf Z(\ginv(\mathbf y_i|\phi)) + \ln \left| \det \mathbf D\ginv(\mathbf y_i|\phi)\right|
     \right).
 \end{align*}
 This model is generative using \eqref{eq:gen} and can be fitted using \acrfull{mle}.
 
 \section*{State of the Art}%
-\begin{itemize}
-    \item Introduction recently, compare with standard bbvi
-    \item Examples of nfs
-\end{itemize}
+\acrshort{nf} build on basic probablistic rules and have been used in the current form since 2010 \cite{koby2021nf}, but their application to \acrshort{bbvi} was made popular in \citeyear{JimenezRezende2015VariationalIW} by \textcite{JimenezRezende2015VariationalIW}.
+Here, the main \acrshort{nf} were called planar flows and were of the form
+\begin{equation}\label{eq:planar}
+    \mathbf g(\mathbf z | (\mathbf u, \bm \theta, b)) = \mathbf z + \mathbf u h \left(\bm \theta ^T \mathbf z + b\right)
+\end{equation}
+where $h$ is a smooth non-linearity.
+The term added to $\mathbf z$ can be considered as a single neural network unit motivating stacking this function $N$ times to get more expressiveness.
+These flows have the strength of linear-time determinant computation but do not have closed form inverses \cite[Chap. 4.1]{JimenezRezende2015VariationalIW}.
+For running \acrshort{vi}, however, the inverse is not needed and fast computation is key.
+
+Empirical tests were performed, modelling the posterior distribution of deep latent Gaussian models fitted to MNIST and CIFAR-10 \cite[Chap. 6.2]{JimenezRezende2015VariationalIW}.
+As base density, an isotropic Gaussian was used \cite[Chap. 6.1]{JimenezRezende2015VariationalIW} and \acrshort{nf} show competetive performance on this task with \acrshort{kl} and $-\ln p(\mathcal D_{test}$ falling systematically for higher $N$ \cite[Fig. 4, Tab. 2 and 3]{JimenezRezende2015VariationalIW}.
+The choice of $N$ governing complexity and possibility to set $\mathbf g$ to match distributional assumptions were highlighted as strengths compared to e.g. mean-field fixed-form \acrshort{bbvi}.
+
+As each flow of the form \eqref{eq:planar} has limited expressivity, a further version similar to a neural network layer with $L$ hidden units has been proposed on the form
+\begin{equation}
+    \mathbf g(\mathbf z | (\mathbf U, \bm \Theta, \mathbf b)) = \mathbf z + \mathbf U h \left(\bm \Theta ^T \mathbf z + \mathbf b\right)
+\end{equation}
+where $\mathbf U, \bm \Theta \in \RR^{D\times L}, \mathbf b\in \RR^L$ \cite[Chap. 3]{Berg2018SylvesterNF}.
+The flow was named Sylvester's flow after a determinant identity allowing the determinant computation to be efficient for low $L$ \cite[Theorem 1]{Berg2018SylvesterNF}.
+Empirical results show better approximations than the planar flows on most tasks including MNIST with parameters such as $L=16, N=4$ compared to planar $N=16$ \cite[Tab. 3]{Berg2018SylvesterNF}.
+\acrshort{nf} were also compared to plain \acrfull{vae} with fully factorized Gaussians with \acrshort{nf} winning on all tasks \cite[Tab. 1, Tab.2]{Berg2018SylvesterNF}.
+
+Same year as the renewed interest in \acrshort{nf} for \acrshort{vi}, \textcite{Dinh2015NICENI} presented \acrfull{nice}, using \acrshort{nf} for \acrshort{dgm} though not referring to the model as \acrshort{nf}.
+In this context, invertibility is required and expressivity has to be high, motivating the introduction of \emph{coupling flows} defined as
+\begin{equation}
+    \mathbf g(\mathbf z)  = \mathbf w; \mathbf w_{\mathbb I}=\mathbf h(\mathbf z_{\mathbb I} | m(\mathbf z_{\mathbb J})), \mathbf w_{\mathbb J} = \mathbf z_\mathbb J,
+\end{equation}
+where $\mathbf w$ is partitioned disjointyly into $(\mathbf w_\mathbb I, \mathbf w_\mathbb J)$, $\mathbf h(\cdot, \theta)$ is a bijection and $m$ is any function, often a shallow neural network \cite[Chap. 3]{Dinh2015NICENI}\cite[Chap. 3.4]{koby2021nf}.
+For different tasks, different partitionings can be used, and coupling flows along with autoregressive flows, introduced as \acrfull{iaf} by \textcite{Kingma2017ImprovedVI}, are \acrfull{sota} for density estimation of many tabular datasets \cite[Tab. 2]{koby2021nf}and close to \acrshort{sota} on image datasets \cite[Tab. 3]{koby2021nf}.
 
 \section*{Open Problems}%
 \label{sec:Open Problems}
 \begin{itemize}
-    \item Choice of base density?
-    \item What flows are efficient?
-    \item Discrete distributions?
+    \item \emph{How to choose the base density?}
+        Much focus in the literature is on choice of flows $\mathbf g$.
+        The choise of base density $p_\mathbf Z$ is often not analysed, usually being a standard Gaussian.
+        For tail behaviour, the choice of base density has been shown to impact results \cite{Jaini2019TailsOT} and $p_\mathbf Z$ should possibly seen as a form of prior on modelling behaviour \cite[Chap. 5.1.1]{koby2021nf} and could be adapted to the task at hand.
+    \item \emph{How to handle discrete distributions?}
+        To expand the use of \acrshort{nf} to more tasks such as \acrfull{nlp}, discrete target distributions should be modelled.
+        According to \textcite{koby2021nf}, this is currently an open problem. 
+        Some approximations have been succesful in specific cases such as transforming discrete variables to continous by using \acrshort{vae}'s or adding continous noise \cite[Chap. 5.2.2]{koby2021nf}.
+    \item \emph{How compute efficient are flows?}
+        For \acrshort{vi} and most \acrshort{bml}, computational cost of producing a posterior distribution is the largest problem.
+        While all \acrshort{nf} are presented with theoretical computational considerations for the Jacobian, comparative analysis of \acrshort{nf} often only focuses on final approximation accuracy.
+        A possible lack of emprirical performance analyses might stem from the software implementations being newly develope, thus lacking maturity and adequate hardware acceleration.
+        However with the contuined development of unifying frameworks such as Pyro Normalizing Flows \cite{bingham2018pyro}, a timed comparison might be relevant answering the question of what \acrshort{nf} to use when operating under a constrained compute budget.
 \end{itemize}
 
 \clearpage
