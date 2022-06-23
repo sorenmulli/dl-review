@@ -23,6 +23,7 @@
 \usepackage{nicefrac}
 \usepackage{icomma}
 
+\allowdisplaybreaks
 \usepackage{csquotes}
 \usepackage[backend=biber, style=alphabetic, citestyle=alphabetic, maxcitenames=4, maxbibnames=4, mincitenames=2]{biblatex}
 
@@ -60,7 +61,7 @@
 
 \setlength{\droptitle}{-10ex}
 
-\title{Networks for Variations: A Review of Normalizing Flows for Bayesian Variational Inference}
+\title{Variations from Transformations: A Review of Normalizing Flows}
 
 \author{Søren Winkel Holm}
 \date{\today}
@@ -96,10 +97,7 @@ For both the problem of \acrshort{dgm} specifically and the general task of appr
 This method is here reviewed with a focus on its' relevance for \acrshort{dl}.
 
 \section*{Fundamental Concepts}%
-Let 
-\begin{equation}
-    \mathbf Z \in \RR^D \sim p_\mathbf Z,
-\end{equation}
+Let $ \mathbf Z \in \RR^D \sim p_\mathbf Z$,
 where $p_\mathbf Z$ is a known and analytically tractable distribution, e.g. $p_\mathbf Z=\mathcal N$.
 Now using a composition of $N$ bijective functions $\mathbf g=\mathbf g_N \circ \cdots \circ \mathbf g_1$ with inverse $\ginv=\ginv_N \circ \cdots \circ \ginv_1$ and Jacobian $\mathbf D\mathbf g$,
 set $\mathbf W=\mathbf g (\mathbf Z)$ giving the density of $\mathbf W$
@@ -108,10 +106,17 @@ set $\mathbf W=\mathbf g (\mathbf Z)$ giving the density of $\mathbf W$
 \end{equation}
 In the context of \acrshort{nf}, $\push$ is named the \emph{pushforward} of the base density $p_\mathbf Z$.
 $\push$ pushes the simple density $p_\mathbf Z$ to a possibly arbitrarily complex distribution which is called flow in the \emph{generative direction} \cite{koby2021nf} as
+
+\begin{figure}
+    \centering
+        \includegraphics[page=2, clip, trim=2cm 20cm 11cm 1.3cm, width=\linewidth]{paper.pdf}
+        \caption{Illustration of the flow between target $p_\mathbf Y=p_\mathbf W$ and the base of density $p_\mathbf Z$ produced in \cite[Fig. 1]{koby2021nf}.}
+    \label{fig:paper.pdf}
+\end{figure}\noindent
 \begin{equation}\label{eq:gen}
     \mathbf z \sim p_\mathbf Z \wedge \mathbf w=g(\mathbf z) \Rightarrow \mathbf w \sim \push.
 \end{equation}
-Inversely, $\ginv$ moves density towards the simple distribution, a process called flow in the \emph{normalizing direction} \cite{koby2021nf}.
+Inversely, $\ginv$ moves density towards the simple distribution, a process called flow in the \emph{normalizing direction} \cite{koby2021nf} as exemplified in Figure \ref{fig:paper.pdf}.
 
 Using this construction, arbitrarily complex distributions $p_\mathbf W$ can provenly be represented \cite{boga2007triang}, but the functions are only considered \acrshort{nf} if $\mathbf g_i$, $\ginv_i$ and the Jacobian determinant are easy to compute \cite{koby2021nf} e.g. using 
 \begin{align*}

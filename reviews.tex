@@ -1,0 +1,31 @@
+\documentclass[12pt,fleqn]{article}
+
+\usepackage[english]{babel}
+\usepackage{SpeedyGonzales}
+\usepackage{MediocreMike}
+\usepackage{pdfpages}
+%\usepackage{Blastoise}
+
+\title{Report}
+
+\author{Søren Winkel Holm}
+\date{\today}
+
+
+\graphicspath{{imgs/}}
+\linespread{1.15}
+
+\begin{document}
+
+%\thispagestyle{fancy}
+%\tableofcontents
+\thispagestyle{empty}
+\noindent
+In the following, the three review documents are merged because a single document is required for assignment hand-in.
+When merging, the documents lose hyperlinks and section metadata, so see \url{https://github.com/sorenmulli/dl-review} for better formats -- and possible updates.
+
+\includepdf[pages=-]{differential-privacy/review.pdf}
+\includepdf[pages=-]{lottery-ticket/review.pdf}
+\includepdf[pages=-]{normalizing-flows/review.pdf}
+
+\end{document}
