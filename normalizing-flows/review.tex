@@ -25,6 +25,8 @@
 \usepackage{csquotes}
 \usepackage[backend=biber, style=alphabetic, citestyle=alphabetic, maxcitenames=4, maxbibnames=4, mincitenames=2]{biblatex}
 
+\newcommand{\ginv}{\mathbf f}
+\newcommand{\push}{\mathbf g_\star p_\mathbf Z}
 \mathcode`\*=\number\cdot
 \newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
 \newcommand{\acomm}[1]{\hspace{2.5cm}\text{#1}}
@@ -92,11 +94,73 @@ For both the task of \acrshort{dgm} specifically and the general task of approxi
 This method is here reviewed with a focus on its' relevance for \acrshort{dl}.
 
 \section*{Fundamental Concepts}%
+Let 
+\begin{equation}
+    \mathbf Z \in \RR^2 \sim p_\mathbf Z,
+\end{equation}
+where $p_\mathbf Z$ is known and analytically tractable distribution, e.g. $p_\mathbf Z=\mathcal N$.
+Now using a composition of $N$ bijective functions $\mathbf g=\mathbf g_N \circ \cdots \circ \mathbf g_1$ with inverse $\ginv=\ginv_N \circ \cdots \circ \ginv_1$ and Jacobian $\mathbf D\mathbf g$,
+set $\mathbf W=\mathbf g (\mathbf Z)$ giving the density of $\mathbf W$
+\begin{equation}\label{eq:dens}
+    \push(\mathbf w)= p_\mathbf W(\mathbf w)=\frac{p_\mathbf Z \left(\ginv(\mathbf w)\right)}{\left| \det \mathbf D\mathbf g\left(\ginv(\mathbf w)\right) \right|}.
+\end{equation}
+In the context of \acrshort{nf}, $\push$ is named the \emph{pushforward} of the base density $p_\mathbf Z$.
+$\push$ pushes the simple density $p_\mathbf Z$ to a possibly arbitrarily complex distribution which is called flow in the \emph{generative direction} \cite{koby2021nf} as
+\begin{equation}\label{eq:gen}
+    \mathbf z \sim p_\mathbf Z \wedge \mathbf w=g(\mathbf z) \Rightarrow \mathbf w \sim \push.
+\end{equation}
+Inversely, $\ginv$ moves density towards the simple distribution, a process called flow in the \emph{normalizing direction} \cite{koby2021nf}.
 
+Using this construction, arbitrarily complex distributions $p_\mathbf W$ can provenly be represented \cite{boga2007triang}, but the functions are only considered \acrshort{nf} if $\mathbf g_i$, $\ginv_i$ and the Jacobian determinant are easy to compute \cite{koby2021nf} e.g. using 
+\begin{align*}
+    &\left| \det \mathbf D\mathbf g\left(\ginv(\mathbf w)\right) \right| \reci 
+    =\numberthis\\
+    &\left| \prod_i^N \det\mathbf D \ginv_i\left(\ginv_{i+1}\circ \cdots \circ \ginv_N(\mathbf w) \right)  \right|.
+\end{align*}
+$\mathbf g$ may have a parametrization $\phi$, resulting in the pushforward being parameter dependant $\push(\mathbf w|\phi)$.
+
+Using \eqref{eq:dens}, \acrshort{nf} allows for density evaluation and using \eqref{eq:gen} for sampling.
+The first quality makes the method relevant for \acrfull{vi} used in \acrshort{bml} for approximating $p=p(\mathbf w | \mathcal D)$ as 
+\begin{equation}
+    q^\star = \operatorname{argmin}_{q\in \mathcal Q} \mathbb D_{KL}[q || p] 
+\end{equation}
+where $\mathbb D_{KL}$ is the \acrfull{kl} and $\mathcal Q$ is the variational family of possible approximations \cite{Blei2016VariationalIA}.
+Minimization of \acrshort{kl} corresponds to maximization of the \acrfull{elbo} which is, assuming this family is parametrized with $\phi$,
+\begin{equation}
+    \mathcal L(\phi) = \mathbb E_{q|\phi}[\ln p(\mathbf w, \mathcal D)] - \mathbb E_{q|\phi}[\ln q(\mathbf w|\phi)].
+\end{equation}
+To optimize this without model-dependant derivations, gradient ascent on the $\mathcal L$ is carried out resulting in \acrfull{bbvi}.
+Here, computing gradients of the form $ \nabla_\phi \mathbb E_{q|\phi}[h(\mathbf w)]$ is required.
+If \acrshort{nf} are used such that $q(\mathbf w|\phi)=\push(\mathbf w| \phi)$, the gradients can be computed using the reparametrization trick \cite{JimenezRezende2015VariationalIW}
+\begin{equation}
+    \nabla_\phi \mathbb E_{q|\phi}[h(\mathbf w)]
+    =
+    \nabla_\phi \mathbb E_{p_\mathbf Z}[h(\mathbf g(\mathbf z | \phi))].
+\end{equation}
+
+An alternative use for \acrshort{nf} is directly modelling data as a type of density estimation.
+Here, data likelihood is
+\begin{align*}
+    & \ln p (\mathcal D| \phi)  = \sum_{i=1}^M \ln \push(\mathbf y_i|\phi) = \\
+    & \sum_{i=1}^M \left(
+        \ln p_\mathbf Z(\ginv(\mathbf y_i|\phi)) + \ln \left| \det \mathbf D\ginv(\mathbf y_i|\phi)\right|,
+    \right).
+\end{align*}
+This model is generative using \eqref{eq:gen} and can be fitted using \acrfull{mle}.
 
 \section*{State of the Art}%
+\begin{itemize}
+    \item Introduction recently, compare with standard bbvi
+    \item Examples of nfs
+\end{itemize}
+
 \section*{Open Problems}%
 \label{sec:Open Problems}
+\begin{itemize}
+    \item Choice of base density?
+    \item What flows are efficient?
+    \item Discrete distributions?
+\end{itemize}
 
 \clearpage
 \renewcommand*{\bibfont}{\normalfont\footnotesize}
