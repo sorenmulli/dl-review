@@ -83,10 +83,8 @@
 \section*{Introduction}%
 \label{sec:Introduction}
 While \acrfull{dl} is celebrated as a universal technological step forward, making complex modelling available to many industries requiring less use of domain-specialised engineers, the computational cost of the training procedure of \acrfull{dnn}'s makes the technology unavailable for low-resource actors.
-The price of large language modelling projects such as Google's T5 is estimated in the region of \$ 10 M and such tech companies have a leading role in research.
+The price of large language modelling projects such as Google's T5 is estimated in the region of \$ 10 M \cite{Sharir2020TheCO} and such tech companies have a leading role in research \cite{ivanov2020icml, ivanov2020neurips}.
 % https://arxiv.org/pdf/2004.08900.pdf
-% https://medium.com/criteo-engineering/neurips-2020-comprehensive-analysis-of-authors-organizations-and-countries-a1b55a08132e
-% https://medium.com/criteo-engineering/icml-2020-comprehensive-analysis-of-authors-organizations-and-countries-c4d1bb847fde
 While the processing of big data is naturally computationally intensive, much of training cost is caused by a large number of epochs being required before convergence.
 \acrfull{lth} points to \acrshort{dnn} learning dynamics that are keeping this number high.
 
@@ -140,6 +138,10 @@ Concurrently, analysis quantifying the performance of winning tickets compared t
 The rewinding to winning matching tickets and retraining of \acrshort{lthr} ended up outperforming standard pruning that fine-tunes final weights.
 Furthermore, the rewinding approach was superior in a limited-budget setting across \acrfull{nlp} and \acrfull{cv} tasks, and it was concluded that \acrshort{lthr} was \acrfull{sota} for pruning in terms of accuracy, compression and computational cost \cite[Chap. 6]{Renda2020ComparingRA} \cite{lange2020lth}.
 
+In \citeyear{Malach2020ProvingTL}, \acrshort{lth} was theoretically proven for fully-connected ReLU \acrshort{dnn}'s by \texcite{Malach2020ProvingTL} using the theory of random networks.
+In the same paper, an even stronger conjecture was proven:
+For every \acrshort{dnn} of sufficient size, there exists an subnetwork achieving matching performance in itself without retraining \cite[Theorem 2.1]{Malach2020ProvingTL}.
+
 \subsubsection*{Early ticket identification}
 The simple train-rewind-retrain approach used to empirically demonstrate the existance of winning matching tickets was revealed to give strong pruning performance across tasks without need for hyperperameter tuning \cite[Chap. 6]{Renda2020ComparingRA}.
 However, this method requires full convergence of the network before identifying the optimal ticket.
@@ -166,8 +168,20 @@ Also, the pruning algorithm \acrfull{snip} contains ideas used in both these met
 \section*{Open Problems}%
 \label{sec:Open Problems}
 \begin{itemize}
-    \item Sparsity not computationally optimal
-    \item LTH Not proven \cite{Tanaka2020PruningNN} proves other things. Look at https://arxiv.org/pdf/1810.02340.pdf
+    % \item \emph{What are we talking about when finding winning tickets?}
+    %     Though the foundational 
+    \item \emph{Do tickets generalize?}
+        In the original form, a winning ticket is winning for a specific initialization for a specific learning problem and optimization procedure.
+        If, for this specific task, the ticket gradient flow is optimal, it might be natural to assume that the ticket is also relevant for other problems.
+        Existing tests of such ideas show promising results, but are limited to \acrshort{cv} and require care for optimization procedure \cite{Morcos2019OneTT}.
+        If cross-task winning tickets are reliably found, these configurations be considered optimal inductive biases and help explain general \acrshort{dnn} learning dynamics.
+    \item \emph{How do we use sparsity for improved computational efficiency?}
+        Though \acrshort{lth} approaches can compress by staggering factors, they are generally unstructured in their pruning and thus still require the same number of layers.
+        Though the pruned network takes up much less storage, the runtime might not be reduced much using modern parallelized \acrshort{dnn} implementations.
+        Further work could improve this, either on the execution side by improving inference of sparse networks, or on the pruning side by focusing on structure \acrshort{lth} for computational efficiency.
+    \item \emph{Can lottery tickets be used to change architectures?}
+        If a subnetwork is all you need for effective learning, \acrshort{dnn} design could altogether be changed towards to the beneficial patterns in the tickets.
+        The understanding of why lottery tickets improve early learning is thus valuable when considering the optimal architecture for a swift training process resulting in general learning.
 \end{itemize}
 
 \clearpage
